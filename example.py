@@ -29,5 +29,31 @@ cp = phase_speed(f, k)
 cg = group_speed(f, k, depth)
 dk = 2 * np.pi * f / cg
 
+duration = 300
+output_interval = 1
+wind_speed = 5
+
 Fk_init = wind_wave_balance(source_input(0.8, f, k, cp), f, k)
-time, swh, mwp, dwp, mss, tau, Fk = integrate(Fk_init, f, k, cp, cg, x, 5, 3600, 0.01)
+time, swh, mwp, dwp, mss, tau, Fk = \
+    integrate(Fk_init, f, k, cp, cg, x, wind_speed, duration, output_interval)
+
+fig = plt.figure(figsize=(8, 6))
+plt.plot(time, swh[:,:], lw=1)
+plt.xlim(0, duration)
+plt.ylim(0, 0.03)
+plt.xlabel('Time [s]')
+plt.ylabel(r'$H_S$ [m]')
+plt.title('Significant wave height')
+plt.savefig('swh.png')
+plt.close()
+
+
+fig = plt.figure(figsize=(8, 6))
+plt.plot(time, dwp[:,:], lw=1)
+plt.xlim(0, duration)
+plt.ylim(0, 1)
+plt.xlabel('Time [s]')
+plt.ylabel(r'$T_P$ [m]')
+plt.title('Peak wave period')
+plt.savefig('dwp.png')
+plt.close()

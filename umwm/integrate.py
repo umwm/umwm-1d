@@ -7,7 +7,7 @@ from umwm.physics import mean_squared_slope, source_input, source_dissipation, \
                          source_wave_interaction
 
 def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
-              mss_coefficient=120, snl_coefficient=1):
+              mss_coefficient=120, snl_coefficient=1, exp_growth_factor=0.1):
     num_time_steps = int(duration / output_interval)
     num_grid_points = k.shape[0]
     
@@ -20,7 +20,8 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
     
     dk = 2 * np.pi * f / cg
     Fk = 1. * Fk_init[:]
-   
+  
+    time_steps = []
     for n in range(num_time_steps):
         elapsed = 0
         print('integrate: time step ', n, '/', num_time_steps)
@@ -30,7 +31,8 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
             Sds = source_dissipation(Fk, f, k, dk, mss_coefficient=mss_coefficient)
             Snl = source_wave_interaction(Fk, k, dk, snl_coefficient=snl_coefficient)
 
-            dt = np.min([0.1 / np.max(np.abs(Sin - Sds)), output_interval - elapsed])
+            dt = np.min([exp_growth_factor / np.max(np.abs(Sin - Sds)), output_interval - elapsed])
+            time_steps.append(dt)
 
             Fk = Fk * np.exp(dt * (Sin - Sds)) + dt * (Snl - advect(Fk, cg, x))
             elapsed += dt
@@ -42,4 +44,4 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
         mss[n,:] = mean_squared_slope(Fk, k, dk)
         tau[n,:] = form_drag(Sin, Fk, cp, dk)
         
-    return time, swh, mwp, dwp, mss, tau, Fk
+    return time, swh, mwp, dwp, mss, tau, Fk, time_steps

@@ -34,10 +34,8 @@ output_interval = 1
 wind_speed = 30
 
 Fk_init = wind_wave_balance(source_input(0.8, f, k, cp), f, k)
-time, swh, mwp, dwp, mss, tau, Fk, time_steps = \
-    integrate(Fk_init, f, k, cp, cg, x, wind_speed, duration, output_interval, exp_growth_factor=0.1)
-
-print(np.mean(time_steps), np.var(time_steps))
+time, swh, mwp, dwp, mss, tau, Fk = \
+    integrate(Fk_init, f, k, cp, cg, x, wind_speed, duration, output_interval)
 
 fig = plt.figure(figsize=(8, 6))
 plt.plot(time, swh[:,:], lw=1)

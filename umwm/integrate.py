@@ -44,4 +44,4 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
         mss[n,:] = mean_squared_slope(Fk, k, dk)
         tau[n,:] = form_drag(Sin, Fk, cp, dk)
         
-    return time, swh, mwp, dwp, mss, tau, Fk, time_steps
+    return time, swh, mwp, dwp, mss, tau, Fk

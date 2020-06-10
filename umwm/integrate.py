@@ -5,6 +5,8 @@ from umwm.diagnostics import significant_wave_height, form_drag, \
                              mean_wave_period, dominant_wave_period
 from umwm.physics import mean_squared_slope, source_input, source_dissipation, \
                          source_wave_interaction
+import sys
+
 
 def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
               mss_coefficient=120, snl_coefficient=1, exp_growth_factor=0.1):
@@ -24,7 +26,6 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
     time_steps = []
     for n in range(num_time_steps):
         elapsed = 0
-        print('integrate: time step ', n, '/', num_time_steps)
         while elapsed < output_interval:
         
             Sin = source_input(wspd, f, k, cp)
@@ -37,6 +38,9 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
             Fk = Fk * np.exp(dt * (Sin - Sds)) + dt * (Snl - advect(Fk, cg, x))
             elapsed += dt
         
+        sys.stdout.write('\r')
+        sys.stdout.write('integrate: time step ' + str(n) + '/' + str(num_time_steps))
+        
         time[n] = n * output_interval
         swh[n,:] = significant_wave_height(Fk, dk)
         mwp[n,:] = mean_wave_period(Fk, f)
@@ -44,4 +48,6 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
         mss[n,:] = mean_squared_slope(Fk, k, dk)
         tau[n,:] = form_drag(Sin, Fk, cp, dk)
         
+    sys.stdout.write('\n')
+    
     return time, swh, mwp, dwp, mss, tau, Fk

@@ -9,7 +9,12 @@ import sys
 
 
 def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
-              mss_coefficient=120, snl_coefficient=1, exp_growth_factor=0.1):
+              sheltering_coefficient=0.11,
+	      mss_coefficient=120, 
+	      snl_coefficient=1, 
+	      dissipation_coefficient=42, 
+	      dissipation_power=2.4,
+	      exp_growth_factor=0.1):
     num_time_steps = int(duration / output_interval)
     num_grid_points = k.shape[0]
     
@@ -28,8 +33,11 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
         elapsed = 0
         while elapsed < output_interval:
         
-            Sin = source_input(wspd, f, k, cp)
-            Sds = source_dissipation(Fk, f, k, dk, mss_coefficient=mss_coefficient)
+            Sin = source_input(wspd, f, k, cp, sheltering_coefficient=sheltering_coefficient)
+            Sds = source_dissipation(Fk, f, k, dk, 
+	        dissipation_coefficient=dissipation_coefficient,
+	        dissipation_power=dissipation_power,
+	        mss_coefficient=mss_coefficient)
             Snl = source_wave_interaction(Fk, k, dk, snl_coefficient=snl_coefficient)
 
             dt = np.min([exp_growth_factor / np.max(np.abs(Sin - Sds)), output_interval - elapsed])

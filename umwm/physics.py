@@ -74,7 +74,7 @@ def wind_wave_balance(source_input, frequency, wavenumber, dissipation_coefficie
                       dissipation_power=2.4, mss=0, mss_coefficient=120):
     """Returns the spectrum for which the dissipation is balanced by input."""
     omega = 2 * np.pi * frequency
-    mss_effect = (1 + mss_coefficient*mss)**2
+    mss_effect = (1 + mss_coefficient * mss)**2
     Fk = (source_input / (omega * dissipation_coefficient * mss_effect))**(1 / dissipation_power) / wavenumber**4
     Fk[np.isnan(Fk)] = 0
     return Fk

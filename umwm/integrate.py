@@ -11,7 +11,7 @@ import sys
 def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
               sheltering_coefficient=0.11,
 	      mss_coefficient=120, 
-	      snl_coefficient=1, 
+	      snl_coefficient=0.1,
 	      dissipation_coefficient=42, 
 	      dissipation_power=2.4,
 	      exp_growth_factor=0.1):
@@ -25,7 +25,10 @@ def integrate(Fk_init, f, k, cp, cg, x, wspd, duration, output_interval,
     mss = np.zeros((num_time_steps, num_grid_points))
     tau = np.zeros((num_time_steps, num_grid_points))
     
-    dk = 2 * np.pi * f / cg
+    dk = np.zeros(k.shape)
+    dk[:,1:] = np.diff(k, 1)
+    dk[:,0] = dk[:,1]
+
     Fk = 1. * Fk_init[:]
   
     time_steps = []

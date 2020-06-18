@@ -80,6 +80,21 @@ def wind_wave_balance(source_input, frequency, wavenumber, dissipation_coefficie
     return Fk
 
 
+def wind_wave_balance_mss(U, f, k, cp, shelt_coeff=0.11, sds_coeff=42, sds_pow=2.4, mss_coeff=120):
+    dk = np.zeros(k.shape)
+    dk[:,1:] = np.diff(k, 1)
+    dk[:,0] = dk[:,1]
+    F = np.zeros(k.shape)
+    for n in range(5):
+        mss = mean_squared_slope_long(F, k, dk)
+        F = wind_wave_balance(source_input(U, f, k, cp, sheltering_coefficient=shelt_coeff), 
+                              f, k, mss=mss,
+                              dissipation_coefficient=sds_coeff,
+                              dissipation_power=sds_pow,
+                              mss_coefficient=mss_coeff)
+    return F
+
+
 def source_wave_interaction(spectrum_k, k, dk, snl_coefficient=1):
     """A simple, minimalisting, nonlinear downshifting function."""
     Snl = np.zeros((k.shape))
